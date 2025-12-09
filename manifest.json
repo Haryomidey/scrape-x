@@ -1,14 +1,13 @@
 {
     "manifest_version": 3,
-    "name": "Image Scraper & Converter",
+    "name": "ScrapeX",
     "version": "1.0",
     "description": "Scrape all images on a webpage, download or convert them.",
     
     "permissions": [
         "activeTab",
         "scripting",
-        "downloads",
-        "storage"
+        "downloads"
     ],
 
     "host_permissions": ["<all_urls>"],
@@ -19,7 +18,7 @@
 
     "action": {
         "default_popup": "popup.html",
-        "default_title": "Image Scraper",
+        "default_title": "ScrapeX",
         "default_icon": {
             "16": "icons/16.png",
             "48": "icons/48.png",

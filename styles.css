@@ -16,6 +16,16 @@
 * {
     box-sizing: border-box;
     font-family: 'Abhaya Libre', sans-serif;
+    outline: none;
+}
+
+*::-webkit-scrollbar{
+    width: 5px;
+}
+
+*::-webkit-scrollbar-thumb{
+    background: var(--accent);
+    border-radius: 10px;
 }
 
 html, body {
@@ -256,4 +266,52 @@ html, body {
     background: var(--drag-bg);
     pointer-events: none;
     z-index: 1000;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.tab-btn.active {
+    background: var(--accent);
+    color: white;
+}
+
+.tab-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: all .2s ease;
+}
+
+.tab-btn:hover {
+    transform: translateY(-1px);
+}
+
+.svg-wrap {
+    width: 100%;
+    height: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f7f9fc;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.svg-wrap svg {
+    max-width: 80%;
+    max-height: 80%;
+    fill: var(--accent);
+}
+
+.images-only {
+    display: none;
+    flex-direction: row;
+    gap: 8px;
 }
