@@ -31,9 +31,13 @@ export async function convertBlobWithCanvas(blob, format) {
             canvas.height = img.height;
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0);
+            URL.revokeObjectURL(img.src);
             canvas.toBlob(b => resolve(b), `image/${format}`);
         };
-        img.onerror = () => resolve(null);
+        img.onerror = () => {
+            URL.revokeObjectURL(img.src);
+            resolve(null);
+        };
         img.src = URL.createObjectURL(blob);
     });
 }
@@ -42,4 +46,20 @@ export function truncateName(name, length = 18) {
     if (name.length <= length) return name;
     const ext = name.includes(".") ? "." + name.split(".").pop() : "";
     return name.slice(0, length) + "…" + ext;
+}
+
+export function extensionFromFilename(name = "") {
+    const ext = name.split("?")[0].split("#")[0].split(".").pop();
+    if (!ext || ext === name) return "";
+    return ext.toLowerCase() === "jpg" ? "jpeg" : ext.toLowerCase();
+}
+
+export function toJsxSvg(svg = "") {
+    return String(svg)
+        .replace(/\bclass=/g, "className=")
+        .replace(/\bstroke-width=/g, "strokeWidth=")
+        .replace(/\bstroke-linecap=/g, "strokeLinecap=")
+        .replace(/\bstroke-linejoin=/g, "strokeLinejoin=")
+        .replace(/\bfill-rule=/g, "fillRule=")
+        .replace(/\bclip-rule=/g, "clipRule=");
 }

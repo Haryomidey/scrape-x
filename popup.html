@@ -23,7 +23,7 @@
         </header>
 
         <div class="scan-switch">
-            <button id="scrape-images-btn" class="btn primary">Images</button>
+            <button id="scrape-images-btn" class="btn active">Images</button>
             <button id="scrape-icons-btn" class="btn">Icons</button>
         </div>
 
@@ -36,13 +36,70 @@
                     <option value="jpeg">JPG</option>
                     <option value="webp">WEBP</option>
                 </select>
+                <label for="filename-prefix">Prefix</label>
+                <input id="filename-prefix" type="text" placeholder="optional" />
+                <label class="toggle-inline">
+                    <input id="folder-by-domain" type="checkbox" />
+                    Folder by domain
+                </label>
                 <button id="export-json" class="small-btn">Export JSON</button>
+            </div>
+
+            <div class="filter-row">
+                <label for="type-filter">Type</label>
+                <select id="type-filter">
+                    <option value="all">All</option>
+                    <option value="png">PNG</option>
+                    <option value="jpeg">JPG</option>
+                    <option value="webp">WEBP</option>
+                    <option value="gif">GIF</option>
+                </select>
+                <label for="min-width">Min W</label>
+                <input id="min-width" type="number" min="0" value="0" />
+                <label for="min-height">Min H</label>
+                <input id="min-height" type="number" min="0" value="0" />
+                <label for="sort-select">Sort</label>
+                <select id="sort-select">
+                    <option value="default">Default</option>
+                    <option value="name-asc">Filename A-Z</option>
+                    <option value="name-desc">Filename Z-A</option>
+                    <option value="width-desc">Width high-low</option>
+                    <option value="height-desc">Height high-low</option>
+                    <option value="type-asc">Type A-Z</option>
+                </select>
+                <button id="apply-filters" class="small-btn">Apply</button>
+                <button id="reset-filters" class="small-btn">Reset</button>
+            </div>
+
+            <div class="toggle-row">
+                <label class="toggle-inline">
+                    <input id="dedupe-toggle" type="checkbox" checked />
+                    Dedupe URLs
+                </label>
+                <label class="toggle-inline">
+                    <input id="new-only-toggle" type="checkbox" />
+                    New since last scan
+                </label>
+                <label class="toggle-inline">
+                    <input id="favorites-only-toggle" type="checkbox" />
+                    Favorites only
+                </label>
             </div>
 
             <div class="action-buttons">
                 <button id="download-selected" class="btn">Download Selected</button>
                 <button id="download-all" class="btn">Download All</button>
+                <button id="retry-failed" class="btn">Retry Failed</button>
+                <button id="clear-favorites" class="btn">Clear Favorites</button>
             </div>
+        </section>
+
+        <section class="queue-panel images-only">
+            <div class="queue-meta">
+                <span id="queue-label">Queue: Idle</span>
+                <span id="failed-count">Failed: 0</span>
+            </div>
+            <progress id="queue-progress" max="100" value="0"></progress>
         </section>
 
         <main id="image-container" class="grid" aria-live="polite"></main>

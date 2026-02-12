@@ -1,24 +1,35 @@
 import { tryDownload } from "./download.js";
-import { truncateName, safeFilename } from "./utils.js";
+import { truncateName, safeFilename, toJsxSvg } from "./utils.js";
+
+function metadataText(item) {
+    const bits = [];
+    if (item.type) bits.push(item.type.toUpperCase());
+    if (item.width && item.height) bits.push(`${item.width}x${item.height}`);
+    if (item.source) bits.push(item.source);
+    return bits.join(" • ");
+}
 
 export function renderImages(container, imageCount, images, selected, formatSelect, attachImageEventListeners, options = {}) {
-    const { hideImageControls = false } = options;
+    const {
+        hideImageControls = false,
+        favorites = new Set()
+    } = options;
 
     container.innerHTML = "";
     imageCount.textContent = `${images.length} items`;
     selected.clear();
 
     if (images.length === 0) {
-        container.innerHTML = `<div style="padding:12px;color:var(--muted)">No images/icons found. Try clicking "Scan".</div>`;
+        container.innerHTML = `<div class="empty-state">No items found for current filters.</div>`;
         return;
     }
 
     images.forEach(item => {
         const div = document.createElement("div");
-        div.className = `item ${item.isSvg ? "icon-item" : ""}`.trim();
+        div.className = `item ${item.isSvg ? "icon-item" : ""} ${favorites.has(item.id) ? "favorite" : ""}`.trim();
         div.dataset.id = item.id;
 
-        let thumbHTML = '';
+        let thumbHTML = "";
         if (item.isSvg && item.jsx) {
             thumbHTML = `<div class="svg-wrap" id="wrap-${item.id}" aria-busy="false">${item.jsx}</div>`;
         } else {
@@ -38,12 +49,14 @@ export function renderImages(container, imageCount, images, selected, formatSele
                     <span title="${item.filename}">${truncateName(item.filename, 18)}</span>
                 </label>
                 <div class="controls-right">
+                    <button class="small-btn favorite-btn ${favorites.has(item.id) ? "on" : ""}" data-id="${item.id}">★</button>
                     ${item.isSvg ? `<button class="small-btn copy-svg-btn" data-id="${item.id}">Copy SVG</button>
-                                    <button class="small-btn copy-jsx-btn" data-id="${item.id}">Copy JSX</button>` : ''}
-                    ${!hideImageControls && !item.isSvg ? `<button class="small-btn convert-btn" data-id="${item.id}">Convert</button>
-                    <button class="small-btn download-btn" data-id="${item.id}">Download</button>` : ''}
+                                    <button class="small-btn copy-jsx-btn" data-id="${item.id}">Copy JSX</button>` : ""}
+                    ${!hideImageControls && !item.isSvg ? `<button class="small-btn download-btn" data-id="${item.id}">Download</button>` : ""}
                 </div>
             </div>
+            <div class="meta-line">${metadataText(item)}</div>
+            ${item.isNew ? `<div class="pill new-pill">New</div>` : ""}
         `;
 
         container.appendChild(div);
@@ -64,17 +77,22 @@ export function renderImages(container, imageCount, images, selected, formatSele
                 const skeleton = document.getElementById(`skeleton-${item.id}`);
                 if (skeleton) skeleton.remove();
                 const wrap = document.getElementById(`wrap-${item.id}`);
-                if (wrap) wrap.innerHTML = `<div style="font-size:12px;color:${getComputedStyle(document.documentElement).getPropertyValue('--muted')};text-align:center;padding:8px">Preview not available</div>`;
+                if (wrap) wrap.innerHTML = `<div class="preview-error">Preview not available</div>`;
                 if (wrap) wrap.setAttribute("aria-busy", "false");
             };
         }
-
     });
 
     attachImageEventListeners();
 }
 
-export function attachCheckboxAndButtonEvents(container, images, selected, formatSelect, updateSelectionUI) {
+export function attachCheckboxAndButtonEvents(container, images, selected, formatSelect, updateSelectionUI, options = {}) {
+    const {
+        onToggleFavorite,
+        onNotify,
+        favorites = new Set()
+    } = options;
+
     container.querySelectorAll(".chk").forEach(cb => {
         cb.addEventListener("change", () => {
             const id = cb.dataset.id;
@@ -93,16 +111,19 @@ export function attachCheckboxAndButtonEvents(container, images, selected, forma
             if (!item) return;
             const chosen = formatSelect.value || "original";
             await tryDownload(item.url, safeFilename(item.filename), chosen);
+            onNotify?.(`Downloaded ${item.filename}`);
         });
     });
 
-    container.querySelectorAll(".convert-btn").forEach(btn => {
-        btn.addEventListener("click", async () => {
+    container.querySelectorAll(".favorite-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
             const id = btn.dataset.id;
-            const item = images.find(i => i.id === id);
-            if (!item || item.isSvg) return;
-            const chosen = formatSelect.value;
-            await tryDownload(item.url, safeFilename(item.filename), chosen);
+            if (!id) return;
+            onToggleFavorite?.(id);
+            const on = favorites.has(id);
+            btn.classList.toggle("on", on);
+            const card = btn.closest(".item");
+            if (card) card.classList.toggle("favorite", on);
         });
     });
 
@@ -111,7 +132,7 @@ export function attachCheckboxAndButtonEvents(container, images, selected, forma
             const id = btn.dataset.id;
             const item = images.find(i => i.id === id);
             if (!item || !item.isSvg) return;
-            navigator.clipboard.writeText(item.jsx).then(() => alert("SVG copied to clipboard!"));
+            navigator.clipboard.writeText(item.jsx).then(() => onNotify?.("SVG copied"));
         });
     });
 
@@ -120,7 +141,7 @@ export function attachCheckboxAndButtonEvents(container, images, selected, forma
             const id = btn.dataset.id;
             const item = images.find(i => i.id === id);
             if (!item || !item.isSvg) return;
-            navigator.clipboard.writeText(item.jsx).then(() => alert("JSX copied to clipboard!"));
+            navigator.clipboard.writeText(toJsxSvg(item.jsx)).then(() => onNotify?.("JSX copied"));
         });
     });
 }
