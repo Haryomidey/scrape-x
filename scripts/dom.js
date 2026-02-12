@@ -15,7 +15,7 @@ export function renderImages(container, imageCount, images, selected, formatSele
 
     images.forEach(item => {
         const div = document.createElement("div");
-        div.className = "item";
+        div.className = `item ${item.isSvg ? "icon-item" : ""}`.trim();
         div.dataset.id = item.id;
 
         let thumbHTML = '';
@@ -80,6 +80,8 @@ export function attachCheckboxAndButtonEvents(container, images, selected, forma
             const id = cb.dataset.id;
             if (cb.checked) selected.add(id);
             else selected.delete(id);
+            const card = cb.closest(".item");
+            if (card) card.classList.toggle("selected", cb.checked);
             updateSelectionUI();
         });
     });
@@ -89,7 +91,8 @@ export function attachCheckboxAndButtonEvents(container, images, selected, forma
             const id = btn.dataset.id;
             const item = images.find(i => i.id === id);
             if (!item) return;
-            await tryDownload(item.url, safeFilename(item.filename), "original");
+            const chosen = formatSelect.value || "original";
+            await tryDownload(item.url, safeFilename(item.filename), chosen);
         });
     });
 

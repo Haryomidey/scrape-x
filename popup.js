@@ -8,7 +8,6 @@ const selectAllBox = document.getElementById("select-all");
 const formatSelect = document.getElementById("format-select");
 const statusEl = document.getElementById("status");
 const downloadSelectedBtn = document.getElementById("download-selected");
-const downloadSelectedConvertBtn = document.getElementById("download-selected-convert");
 const downloadAllBtn = document.getElementById("download-all");
 const scrapeImagesBtn = document.getElementById("scrape-images-btn");
 const scrapeIconsBtn = document.getElementById("scrape-icons-btn");
@@ -19,6 +18,10 @@ let selected = new Set();
 
 function setStatus(text) {
     statusEl.textContent = text;
+}
+
+function getChosenFormat() {
+    return formatSelect.value || "original";
 }
 
 function updateSelectionUI() {
@@ -33,7 +36,7 @@ function attachEvents() {
 
 function toggleImageControls(show) {
     document.querySelectorAll(".images-only").forEach(el => {
-        el.style.display = show ? "flex" : "none";
+        el.style.display = show ? "grid" : "none";
     });
     selectAllBox.style.display = show ? "inline-flex" : "none";
 }
@@ -87,35 +90,24 @@ scrapeIconsBtn.addEventListener("click", () => {
 });
 
 downloadAllBtn.addEventListener("click", async () => {
-    setStatus("Downloading all images...");
+    const chosen = getChosenFormat();
+    setStatus(chosen === "original" ? "Downloading all images..." : `Downloading all as ${chosen.toUpperCase()}...`);
     for (const item of images) {
-        if (!item.isSvg) await tryDownload(item.url, item.filename, "original");
+        if (!item.isSvg) await tryDownload(item.url, item.filename, chosen);
     }
     setStatus("All downloads started");
 });
 
 downloadSelectedBtn.addEventListener("click", async () => {
     if (selected.size === 0) return setStatus("No items selected");
-    setStatus("Downloading selected...");
-    for (const id of selected) {
-        const item = images.find(i => i.id === id);
-        if (!item || item.isSvg) continue;
-        await tryDownload(item.url, item.filename, "original");
-    }
-    setStatus("Selected downloads started");
-});
-
-downloadSelectedConvertBtn.addEventListener("click", async () => {
-    if (selected.size === 0) return setStatus("No items selected");
-    const chosen = formatSelect.value;
-    if (chosen === "original") return setStatus("Choose a format to convert");
-    setStatus("Converting & downloading selected...");
+    const chosen = getChosenFormat();
+    setStatus(chosen === "original" ? "Downloading selected..." : `Downloading selected as ${chosen.toUpperCase()}...`);
     for (const id of selected) {
         const item = images.find(i => i.id === id);
         if (!item || item.isSvg) continue;
         await tryDownload(item.url, item.filename, chosen);
     }
-    setStatus("Selected conversions started");
+    setStatus("Selected downloads started");
 });
 
 exportJsonBtn.addEventListener("click", () => {
