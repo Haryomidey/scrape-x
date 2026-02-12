@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
-
 :root {
     --bg: #eef2f6;
     --panel: #ffffff;
@@ -18,7 +16,7 @@
 
 * {
     box-sizing: border-box;
-    font-family: "Manrope", sans-serif;
+    font-family: "Segoe UI", "Inter", "Roboto", Arial, sans-serif;
 }
 
 html,
