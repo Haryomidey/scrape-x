@@ -55,6 +55,33 @@ let currentMode = "images";
 let currentDomain = "site";
 let queueRunning = false;
 
+function normalizedAssetKey(item) {
+    if (!item) return "";
+
+    if (item.isSvg) {
+        return String(item.jsx || "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .toLowerCase();
+    }
+
+    const raw = String(item.url || "").trim();
+    if (!raw) return "";
+
+    if (raw.startsWith("data:")) {
+        const mime = raw.slice(0, raw.indexOf(",") > -1 ? raw.indexOf(",") : raw.length).toLowerCase();
+        const payload = raw.split(",")[1] || "";
+        return `${mime},${payload}`;
+    }
+
+    try {
+        const url = new URL(raw);
+        return `${url.origin}${url.pathname}`.toLowerCase();
+    } catch {
+        return raw.split("#")[0].split("?")[0].toLowerCase();
+    }
+}
+
 function setStatus(text) {
     statusEl.textContent = text;
 }
@@ -176,7 +203,7 @@ function filterItems(list) {
     if (settings.dedupe) {
         const seen = new Set();
         out = out.filter(item => {
-            const key = item.isSvg ? item.jsx : item.url;
+            const key = normalizedAssetKey(item);
             if (!key || seen.has(key)) return false;
             seen.add(key);
             return true;
@@ -265,9 +292,9 @@ async function scan(mode) {
 
         const items = await scrapeImagesFromActiveTab();
         const modeItems = items.filter(item => mode === "images" ? !item.isSvg : item.isSvg);
-        const currentKeys = new Set(modeItems.map(i => i.isSvg ? i.jsx : i.url));
+        const currentKeys = new Set(modeItems.map(i => normalizedAssetKey(i)));
         modeItems.forEach(item => {
-            const key = item.isSvg ? item.jsx : item.url;
+            const key = normalizedAssetKey(item);
             item.favoriteKey = key || item.filename;
             item.isNew = !previousScanKeys.has(key);
         });
@@ -303,18 +330,32 @@ async function queueDownloads(items) {
     queueRunning = true;
     failedDownloads = [];
     const format = currentFormat();
-    let done = 0;
-    updateQueueUI(done, items.length);
-
+    const uniqueItems = [];
+    const seen = new Set();
     for (const item of items) {
+        const key = normalizedAssetKey(item);
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        uniqueItems.push(item);
+    }
+
+    let done = 0;
+    updateQueueUI(done, uniqueItems.length);
+
+    for (const item of uniqueItems) {
         const ok = await tryDownload(item.url, buildOutputName(item, format), format);
         if (!ok) failedDownloads.push(item);
         done += 1;
-        updateQueueUI(done, items.length);
+        updateQueueUI(done, uniqueItems.length);
     }
 
     queueRunning = false;
-    setStatus(failedDownloads.length ? `Done with ${failedDownloads.length} failures` : "All downloads started");
+    const skipped = items.length - uniqueItems.length;
+    if (failedDownloads.length) {
+        setStatus(`Done with ${failedDownloads.length} failures${skipped > 0 ? `, skipped ${skipped} duplicates` : ""}`);
+    } else {
+        setStatus(`All downloads started${skipped > 0 ? `, skipped ${skipped} duplicates` : ""}`);
+    }
 }
 
 function resetFilters() {
