@@ -11,8 +11,7 @@ function metadataText(item) {
 
 export function renderImages(container, imageCount, images, selected, formatSelect, attachImageEventListeners, options = {}) {
     const {
-        hideImageControls = false,
-        favorites = new Set()
+        hideImageControls = false
     } = options;
 
     container.innerHTML = "";
@@ -26,7 +25,7 @@ export function renderImages(container, imageCount, images, selected, formatSele
 
     images.forEach(item => {
         const div = document.createElement("div");
-        div.className = `item ${item.isSvg ? "icon-item" : ""} ${favorites.has(item.id) ? "favorite" : ""}`.trim();
+        div.className = `item ${item.isSvg ? "icon-item" : ""} ${item.isFavorite ? "favorite" : ""}`.trim();
         div.dataset.id = item.id;
 
         let thumbHTML = "";
@@ -49,7 +48,7 @@ export function renderImages(container, imageCount, images, selected, formatSele
                     <span title="${item.filename}">${truncateName(item.filename, 18)}</span>
                 </label>
                 <div class="controls-right">
-                    <button class="small-btn favorite-btn ${favorites.has(item.id) ? "on" : ""}" data-id="${item.id}">★</button>
+                    <button class="small-btn favorite-btn ${item.isFavorite ? "on" : ""}" data-id="${item.id}">★</button>
                     ${item.isSvg ? `<button class="small-btn copy-svg-btn" data-id="${item.id}">Copy SVG</button>
                                     <button class="small-btn copy-jsx-btn" data-id="${item.id}">Copy JSX</button>` : ""}
                     ${!hideImageControls && !item.isSvg ? `<button class="small-btn download-btn" data-id="${item.id}">Download</button>` : ""}
@@ -89,8 +88,7 @@ export function renderImages(container, imageCount, images, selected, formatSele
 export function attachCheckboxAndButtonEvents(container, images, selected, formatSelect, updateSelectionUI, options = {}) {
     const {
         onToggleFavorite,
-        onNotify,
-        favorites = new Set()
+        onNotify
     } = options;
 
     container.querySelectorAll(".chk").forEach(cb => {
@@ -120,10 +118,6 @@ export function attachCheckboxAndButtonEvents(container, images, selected, forma
             const id = btn.dataset.id;
             if (!id) return;
             onToggleFavorite?.(id);
-            const on = favorites.has(id);
-            btn.classList.toggle("on", on);
-            const card = btn.closest(".item");
-            if (card) card.classList.toggle("favorite", on);
         });
     });
 
