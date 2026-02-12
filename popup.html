@@ -4,26 +4,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>ScrapeX</title>
-    <style>
-        html, body {
-            width: 460px;
-            height: 580px;
-            min-width: 460px;
-            min-height: 580px;
-            margin: 0;
-            overflow: hidden;
-        }
-    </style>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <header class="topbar">
-            <div class="brand-block">
+        <header class="header">
+            <div class="brand">
                 <h1>ScrapeX</h1>
-                <p>Professional asset extraction for designers and developers.</p>
+                <p>Extract, preview, and download assets quickly.</p>
             </div>
-            <div class="status-block">
+            <div class="header-right">
                 <div class="count" id="image-count">0 items</div>
                 <label class="select-all">
                     <input type="checkbox" id="select-all" aria-label="Select all items">
@@ -32,100 +22,87 @@
             </div>
         </header>
 
-        <section class="layout">
-            <aside class="control-rail">
-                <div class="scan-switch">
-                    <button id="scrape-images-btn" class="btn active">Images</button>
-                    <button id="scrape-icons-btn" class="btn">Icons</button>
-                </div>
+        <div class="scan-switch">
+            <button id="scrape-images-btn" class="btn active">Images</button>
+            <button id="scrape-icons-btn" class="btn">Icons</button>
+        </div>
 
-                <section class="panel images-only">
-                    <h2>Export</h2>
-                    <div class="panel-grid two-col">
-                        <label for="format-select">Format</label>
-                        <select id="format-select">
-                            <option value="original">Keep original</option>
-                            <option value="png">PNG</option>
-                            <option value="jpeg">JPG</option>
-                            <option value="webp">WEBP</option>
-                        </select>
-                        <label for="filename-prefix">Prefix</label>
-                        <input id="filename-prefix" type="text" placeholder="optional" />
-                    </div>
-                    <label class="toggle-inline">
-                        <input id="folder-by-domain" type="checkbox" />
-                        Create folder by domain
-                    </label>
-                    <button id="export-json" class="small-btn full">Export JSON Metadata</button>
-                </section>
+        <section class="actions images-only">
+            <div class="format-row">
+                <label for="format-select">Format</label>
+                <select id="format-select">
+                    <option value="original">Keep original</option>
+                    <option value="png">PNG</option>
+                    <option value="jpeg">JPG</option>
+                    <option value="webp">WEBP</option>
+                </select>
+                <label for="filename-prefix">Prefix</label>
+                <input id="filename-prefix" type="text" placeholder="optional" />
+                <label class="toggle-inline">
+                    <input id="folder-by-domain" type="checkbox" />
+                    Folder by domain
+                </label>
+                <button id="export-json" class="small-btn">Export JSON</button>
+            </div>
 
-                <section class="panel images-only">
-                    <h2>Filters</h2>
-                    <div class="panel-grid two-col">
-                        <label for="type-filter">Type</label>
-                        <select id="type-filter">
-                            <option value="all">All</option>
-                            <option value="png">PNG</option>
-                            <option value="jpeg">JPG</option>
-                            <option value="webp">WEBP</option>
-                            <option value="gif">GIF</option>
-                        </select>
-                        <label for="min-width">Min width</label>
-                        <input id="min-width" type="number" min="0" value="0" />
-                        <label for="min-height">Min height</label>
-                        <input id="min-height" type="number" min="0" value="0" />
-                        <label for="sort-select">Sort</label>
-                        <select id="sort-select">
-                            <option value="default">Default</option>
-                            <option value="name-asc">Filename A-Z</option>
-                            <option value="name-desc">Filename Z-A</option>
-                            <option value="width-desc">Width high-low</option>
-                            <option value="height-desc">Height high-low</option>
-                            <option value="type-asc">Type A-Z</option>
-                        </select>
-                    </div>
-                    <div class="button-row">
-                        <button id="apply-filters" class="small-btn">Apply</button>
-                        <button id="reset-filters" class="small-btn">Reset</button>
-                    </div>
-                    <div class="toggle-row">
-                        <label class="toggle-inline">
-                            <input id="dedupe-toggle" type="checkbox" checked />
-                            Dedupe URLs
-                        </label>
-                        <label class="toggle-inline">
-                            <input id="new-only-toggle" type="checkbox" />
-                            New since last scan
-                        </label>
-                        <label class="toggle-inline">
-                            <input id="favorites-only-toggle" type="checkbox" />
-                            Favorites only
-                        </label>
-                    </div>
-                </section>
+            <div class="filter-row">
+                <label for="type-filter">Type</label>
+                <select id="type-filter">
+                    <option value="all">All</option>
+                    <option value="png">PNG</option>
+                    <option value="jpeg">JPG</option>
+                    <option value="webp">WEBP</option>
+                    <option value="gif">GIF</option>
+                </select>
+                <label for="min-width">Min W</label>
+                <input id="min-width" type="number" min="0" value="0" />
+                <label for="min-height">Min H</label>
+                <input id="min-height" type="number" min="0" value="0" />
+                <label for="sort-select">Sort</label>
+                <select id="sort-select">
+                    <option value="default">Default</option>
+                    <option value="name-asc">Filename A-Z</option>
+                    <option value="name-desc">Filename Z-A</option>
+                    <option value="width-desc">Width high-low</option>
+                    <option value="height-desc">Height high-low</option>
+                    <option value="type-asc">Type A-Z</option>
+                </select>
+                <button id="apply-filters" class="small-btn">Apply</button>
+                <button id="reset-filters" class="small-btn">Reset</button>
+            </div>
 
-                <section class="panel images-only">
-                    <h2>Download Queue</h2>
-                    <div class="button-stack">
-                        <button id="download-selected" class="btn">Download Selected</button>
-                        <button id="download-all" class="btn">Download All</button>
-                        <button id="retry-failed" class="btn">Retry Failed</button>
-                        <button id="clear-favorites" class="btn">Clear Favorites</button>
-                    </div>
-                    <div class="queue-panel">
-                        <div class="queue-meta">
-                            <span id="queue-label">Queue: Idle</span>
-                            <span id="failed-count">Failed: 0</span>
-                        </div>
-                        <progress id="queue-progress" max="100" value="0"></progress>
-                    </div>
-                </section>
-            </aside>
+            <div class="toggle-row">
+                <label class="toggle-inline">
+                    <input id="dedupe-toggle" type="checkbox" checked />
+                    Dedupe URLs
+                </label>
+                <label class="toggle-inline">
+                    <input id="new-only-toggle" type="checkbox" />
+                    New since last scan
+                </label>
+                <label class="toggle-inline">
+                    <input id="favorites-only-toggle" type="checkbox" />
+                    Favorites only
+                </label>
+            </div>
 
-            <section class="results-column">
-                <main id="image-container" class="grid" aria-live="polite"></main>
-            </section>
+            <div class="action-buttons">
+                <button id="download-selected" class="btn">Download Selected</button>
+                <button id="download-all" class="btn">Download All</button>
+                <button id="retry-failed" class="btn">Retry Failed</button>
+                <button id="clear-favorites" class="btn">Clear Favorites</button>
+            </div>
         </section>
+
+        <section class="queue-panel images-only">
+            <div class="queue-meta">
+                <span id="queue-label">Queue: Idle</span>
+                <span id="failed-count">Failed: 0</span>
+            </div>
+            <progress id="queue-progress" max="100" value="0"></progress>
+        </section>
+
+        <main id="image-container" class="grid" aria-live="polite"></main>
 
         <footer class="footer">
             <small id="status">Idle</small>
