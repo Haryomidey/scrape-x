@@ -71,7 +71,8 @@ export async function scrapeImagesFromActiveTab() {
         const payload = raw?.payload || "";
         const isSvg = raw?.kind === "svg";
         const lower = isSvg ? "" : String(payload).toLowerCase();
-        const typeFromName = lower.split("?")[0].split("#")[0].split(".").pop() || "";
+        const dataMime = lower.startsWith("data:image/") ? lower.slice(11).split(";")[0] : "";
+        const typeFromName = dataMime || lower.split("?")[0].split("#")[0].split(".").pop() || "";
         const normalizedType = typeFromName === "jpg" ? "jpeg" : typeFromName;
         const isGif = !isSvg && normalizedType === "gif";
 

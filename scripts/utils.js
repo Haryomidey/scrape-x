@@ -4,6 +4,15 @@ export function makeId(length = 6) {
 
 export function shortNameFromUrl(url) {
     try {
+        const value = String(url || "");
+        if (value.startsWith("data:image/")) {
+            const mimePart = value.slice(11).split(";")[0].toLowerCase();
+            const ext = mimePart === "svg+xml" ? "svg" : (mimePart === "jpeg" ? "jpg" : mimePart);
+            return `inline-image.${ext}`;
+        }
+        if (value.startsWith("blob:")) {
+            return "blob-image.png";
+        }
         return url.split("/").pop().split("?")[0];
     } catch {
         return "file";

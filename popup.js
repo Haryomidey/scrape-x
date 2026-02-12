@@ -59,6 +59,20 @@ function setStatus(text) {
     statusEl.textContent = text;
 }
 
+function setButtonLoading(button, loading, loadingText = "Loading...") {
+    if (!button) return;
+    if (loading) {
+        if (!button.dataset.originalText) button.dataset.originalText = button.textContent;
+        button.textContent = loadingText;
+        button.classList.add("is-loading");
+        button.disabled = true;
+        return;
+    }
+    if (button.dataset.originalText) button.textContent = button.dataset.originalText;
+    button.classList.remove("is-loading");
+    button.disabled = false;
+}
+
 function updateQueueUI(done = 0, total = 0) {
     const pct = total > 0 ? Math.floor((done / total) * 100) : 0;
     queueProgress.value = pct;
@@ -242,24 +256,30 @@ function activateTab(mode) {
 }
 
 async function scan(mode) {
+    const btn = mode === "images" ? scrapeImagesBtn : scrapeIconsBtn;
+    setButtonLoading(btn, true, "Scanning...");
     activateTab(mode);
-    setStatus(mode === "images" ? "Scanning page for images..." : "Scanning page for icons...");
-    currentDomain = await getActiveDomainFolder();
+    try {
+        setStatus(mode === "images" ? "Scanning page for images..." : "Scanning page for icons...");
+        currentDomain = await getActiveDomainFolder();
 
-    const items = await scrapeImagesFromActiveTab();
-    const modeItems = items.filter(item => mode === "images" ? !item.isSvg : item.isSvg);
-    const currentKeys = new Set(modeItems.map(i => i.isSvg ? i.jsx : i.url));
-    modeItems.forEach(item => {
-        const key = item.isSvg ? item.jsx : item.url;
-        item.favoriteKey = key || item.filename;
-        item.isNew = !previousScanKeys.has(key);
-    });
-    previousScanKeys = currentKeys;
+        const items = await scrapeImagesFromActiveTab();
+        const modeItems = items.filter(item => mode === "images" ? !item.isSvg : item.isSvg);
+        const currentKeys = new Set(modeItems.map(i => i.isSvg ? i.jsx : i.url));
+        modeItems.forEach(item => {
+            const key = item.isSvg ? item.jsx : item.url;
+            item.favoriteKey = key || item.filename;
+            item.isNew = !previousScanKeys.has(key);
+        });
+        previousScanKeys = currentKeys;
 
-    allItems = modeItems;
-    selected.clear();
-    applyView();
-    setStatus(`Found ${modeItems.length} ${mode === "images" ? "images" : "icons"}`);
+        allItems = modeItems;
+        selected.clear();
+        applyView();
+        setStatus(`Found ${modeItems.length} ${mode === "images" ? "images" : "icons"}`);
+    } finally {
+        setButtonLoading(btn, false);
+    }
 }
 
 function buildOutputName(item, format) {
@@ -372,7 +392,12 @@ scrapeIconsBtn.addEventListener("click", () => {
 });
 
 downloadAllBtn.addEventListener("click", async () => {
-    await queueDownloads(images.filter(item => !item.isSvg));
+    setButtonLoading(downloadAllBtn, true, "Downloading...");
+    try {
+        await queueDownloads(images.filter(item => !item.isSvg));
+    } finally {
+        setButtonLoading(downloadAllBtn, false);
+    }
 });
 
 downloadSelectedBtn.addEventListener("click", async () => {
@@ -380,12 +405,22 @@ downloadSelectedBtn.addEventListener("click", async () => {
         setStatus("No items selected");
         return;
     }
-    const selectedItems = images.filter(i => selected.has(i.id) && !i.isSvg);
-    await queueDownloads(selectedItems);
+    setButtonLoading(downloadSelectedBtn, true, "Downloading...");
+    try {
+        const selectedItems = images.filter(i => selected.has(i.id) && !i.isSvg);
+        await queueDownloads(selectedItems);
+    } finally {
+        setButtonLoading(downloadSelectedBtn, false);
+    }
 });
 
 retryFailedBtn.addEventListener("click", async () => {
-    await queueDownloads([...failedDownloads]);
+    setButtonLoading(retryFailedBtn, true, "Retrying...");
+    try {
+        await queueDownloads([...failedDownloads]);
+    } finally {
+        setButtonLoading(retryFailedBtn, false);
+    }
 });
 
 clearFavoritesBtn.addEventListener("click", () => {
@@ -395,7 +430,14 @@ clearFavoritesBtn.addEventListener("click", () => {
     setStatus("Favorites cleared");
 });
 
-exportJsonBtn.addEventListener("click", exportJson);
+exportJsonBtn.addEventListener("click", () => {
+    setButtonLoading(exportJsonBtn, true, "Exporting...");
+    try {
+        exportJson();
+    } finally {
+        setButtonLoading(exportJsonBtn, false);
+    }
+});
 
 [formatSelect, typeFilter, sortSelect].forEach(el => {
     el.addEventListener("change", () => {
