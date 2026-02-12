@@ -37,10 +37,10 @@ html, body {
 
 .container {
     height: 100%;
-    display: grid;
-    grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
-    gap: 12px;
-    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
 }
 
 .header {
@@ -102,12 +102,14 @@ html, body {
 
 .actions {
     display: grid;
-    gap: 10px;
+    gap: 6px;
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 12px;
+    padding: 8px 10px;
+    max-height: 150px;
+    overflow-y: auto;
 }
 
 .format-row,
@@ -115,7 +117,7 @@ html, body {
 .toggle-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
 }
 
@@ -199,7 +201,7 @@ input[type="text"] {
 .action-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 8px;
+    gap: 6px;
 }
 
 #export-json {
@@ -208,12 +210,12 @@ input[type="text"] {
 
 .queue-panel {
     display: grid;
-    gap: 7px;
+    gap: 5px;
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 10px;
+    padding: 7px 10px;
 }
 
 .queue-meta {
@@ -229,7 +231,8 @@ progress {
 }
 
 .grid {
-    min-height: 0;
+    min-height: 120px;
+    flex: 1;
     overflow-y: auto;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -354,6 +357,20 @@ progress {
     color: #946200;
     background: #fff4d6;
     border-color: #edcf86;
+}
+
+.copy-svg-btn.copied,
+.copy-jsx-btn.copied {
+    background: #dff5e8;
+    border-color: #8cc9a4;
+    color: #0b6a45;
+}
+
+.copy-svg-btn.copy-failed,
+.copy-jsx-btn.copy-failed {
+    background: #fde8e8;
+    border-color: #e59a9a;
+    color: #9f2d2d;
 }
 
 .skeleton {

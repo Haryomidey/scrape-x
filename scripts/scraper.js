@@ -40,12 +40,6 @@ export async function scrapeImagesFromActiveTab() {
             const svgEls = Array.from(document.querySelectorAll("svg"));
             const svgAssets = svgEls.map((svg, idx) => {
                 const clone = svg.cloneNode(true);
-                clone.querySelectorAll("*").forEach(el => {
-                    if (el.hasAttribute("class")) {
-                        el.setAttribute("className", el.getAttribute("class"));
-                        el.removeAttribute("class");
-                    }
-                });
                 const rect = svg.getBoundingClientRect();
                 return {
                     key: `svg:${idx}:${clone.outerHTML.length}`,

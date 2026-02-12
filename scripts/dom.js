@@ -9,6 +9,19 @@ function metadataText(item) {
     return bits.join(" • ");
 }
 
+function flashButtonState(btn, text, cls = "copied", delay = 1400) {
+    if (!btn) return;
+    if (!btn.dataset.originalText) btn.dataset.originalText = btn.textContent;
+    btn.textContent = text;
+    btn.classList.add(cls);
+    btn.disabled = true;
+    window.setTimeout(() => {
+        btn.textContent = btn.dataset.originalText || btn.textContent;
+        btn.classList.remove(cls);
+        btn.disabled = false;
+    }, delay);
+}
+
 export function renderImages(container, imageCount, images, selected, formatSelect, attachImageEventListeners, options = {}) {
     const {
         hideImageControls = false
@@ -126,7 +139,13 @@ export function attachCheckboxAndButtonEvents(container, images, selected, forma
             const id = btn.dataset.id;
             const item = images.find(i => i.id === id);
             if (!item || !item.isSvg) return;
-            navigator.clipboard.writeText(item.jsx).then(() => onNotify?.("SVG copied"));
+            navigator.clipboard.writeText(item.jsx).then(() => {
+                flashButtonState(btn, "Copied");
+                onNotify?.("SVG copied");
+            }).catch(() => {
+                flashButtonState(btn, "Failed", "copy-failed");
+                onNotify?.("Copy failed");
+            });
         });
     });
 
@@ -135,7 +154,13 @@ export function attachCheckboxAndButtonEvents(container, images, selected, forma
             const id = btn.dataset.id;
             const item = images.find(i => i.id === id);
             if (!item || !item.isSvg) return;
-            navigator.clipboard.writeText(toJsxSvg(item.jsx)).then(() => onNotify?.("JSX copied"));
+            navigator.clipboard.writeText(toJsxSvg(item.jsx)).then(() => {
+                flashButtonState(btn, "Copied");
+                onNotify?.("JSX copied");
+            }).catch(() => {
+                flashButtonState(btn, "Failed", "copy-failed");
+                onNotify?.("Copy failed");
+            });
         });
     });
 }
