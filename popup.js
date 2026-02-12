@@ -59,9 +59,15 @@ selectAllBox.addEventListener("change", () => {
         checkboxes.forEach(cb => {
             cb.checked = true;
             selected.add(cb.dataset.id);
+            const card = cb.closest(".item");
+            if (card) card.classList.add("selected");
         });
     } else {
-        checkboxes.forEach(cb => cb.checked = false);
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+            const card = cb.closest(".item");
+            if (card) card.classList.remove("selected");
+        });
         selected.clear();
     }
     updateSelectionUI();
