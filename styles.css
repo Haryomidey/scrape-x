@@ -24,7 +24,7 @@
 html,
 body {
     margin: 0;
-    width: 780px;
+    width: 460px;
     height: 580px;
     max-width: 100vw;
     max-height: 100vh;
@@ -46,8 +46,8 @@ body {
     height: 100%;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
-    gap: 12px;
-    padding: 12px;
+    gap: 10px;
+    padding: 10px;
 }
 
 .topbar,
@@ -68,7 +68,7 @@ body {
 
 .brand-block h1 {
     margin: 0;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--brand-ink);
@@ -76,7 +76,7 @@ body {
 
 .brand-block p {
     margin: 6px 0 0;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
 }
 
@@ -107,16 +107,18 @@ body {
 .layout {
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(280px, 330px) minmax(0, 1fr);
-    gap: 12px;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 10px;
 }
 
 .control-rail {
     min-height: 0;
     display: grid;
     gap: 10px;
-    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-rows: auto;
     overflow: auto;
+    max-height: 42vh;
     padding-right: 2px;
 }
 
@@ -147,7 +149,7 @@ body {
 
 .panel h2 {
     margin: 0;
-    font-size: 13px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--muted);
@@ -165,19 +167,19 @@ body {
 
 .panel-grid label,
 .toggle-inline {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
 }
 
 select,
 input[type="number"],
 input[type="text"] {
-    height: 34px;
+    height: 36px;
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--panel-soft);
     color: var(--text);
-    font-size: 12px;
+    font-size: 13px;
     padding: 0 10px;
 }
 
@@ -220,19 +222,19 @@ input[type="number"] {
 }
 
 .btn {
-    min-height: 38px;
+    min-height: 40px;
     padding: 0 12px;
     background: #fff;
     color: var(--brand-ink);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .small-btn {
-    min-height: 34px;
+    min-height: 36px;
     padding: 0 11px;
     background: var(--panel-soft);
     color: var(--text);
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .btn:hover,
@@ -284,7 +286,7 @@ progress {
     height: 100%;
     overflow: auto;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
     padding: 2px;
 }
@@ -380,7 +382,7 @@ progress {
 }
 
 .meta-line {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted);
 }
 
@@ -437,7 +439,7 @@ progress {
 }
 
 #status {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
 }
 
@@ -445,24 +447,14 @@ progress {
     display: none;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 480px) {
     html,
     body {
         width: 100vw;
         height: 100vh;
     }
 
-    .layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto minmax(0, 1fr);
-    }
-
-    .control-rail {
-        grid-template-rows: auto;
-        max-height: 45vh;
-    }
-
     .grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        grid-template-columns: 1fr;
     }
 }
